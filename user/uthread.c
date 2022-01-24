@@ -10,8 +10,25 @@
 #define STACK_SIZE  8192
 #define MAX_THREAD  4
 
+struct regs{
+  /*   0 */ uint64 ra;
+  /*   8 */ uint64 sp;
+  /*  16 */ uint64 s0;
+  /*  24 */ uint64 s1;
+  /*  32 */ uint64 s2;
+  /*  40 */ uint64 s3;
+  /*  48 */ uint64 s4;
+  /*  56 */ uint64 s5;
+  /*  64 */ uint64 s6;
+  /*  72 */ uint64 s7;
+  /*  80 */ uint64 s8;
+  /*  88 */ uint64 s9;
+  /*  96 */ uint64 s10;
+  /* 104 */ uint64 s11;
+};
 
 struct thread {
+  struct regs regs;
   char       stack[STACK_SIZE]; /* the thread's stack */
   int        state;             /* FREE, RUNNING, RUNNABLE */
 };
@@ -62,6 +79,7 @@ thread_schedule(void)
      * Invoke thread_switch to switch from t to next_thread:
      * thread_switch(??, ??);
      */
+    thread_switch((uint64)t, (uint64)next_thread);
   } else
     next_thread = 0;
 }
@@ -76,6 +94,8 @@ thread_create(void (*func)())
   }
   t->state = RUNNABLE;
   // YOUR CODE HERE
+  t->regs.ra=(uint64)func;
+  t->regs.sp=(uint64)t->stack + STACK_SIZE;
 }
 
 void 
